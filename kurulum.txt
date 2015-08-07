@@ -1,0 +1,116 @@
+Başında # işareti olanlar root olarak yapılmalı
+Başında $ işareti olanlar kulanıcı olarak yapılmalı
+Başında -- işareti olanlar sadece yorum.
+Başında hiçbir şey olmayanlar text editörü ile değiştirilmeli
+
+-- SSH için önce aşağıdaki satırları uyguluyoruz
+
+$ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
+$cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+
+#mkdir /etc/ssh/genel
+#cp /home/genel/.ssh/authorized_keys /etc/ssh/genel/
+#chown -R genel:genel /etc/ssh/genel
+#chmod 755 /etc/ssh/genel
+#chmod 644 /etc/ssh/genel/authorized_keys
+#vi /etc/ssh/sshd_config 
+
+AuthorizedKeysFile      /etc/ssh/genel/authorized_keys
+
+-- restart yapıyoruz
+
+-- hadoop kurulumunu genel klasörü altına açıyoruz.
+
+$ vi .bashrc
+
+-- aşağıdaki satırları ekliyoruz. Eğer JAVA_HOME set edilmişse java ile ilgili olanları ekleminize gerek yoktur.
+
+HADOOP_INSTALL=/home/genel/hadoop-2.7.1
+export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
+PATH=$PATH:$HADOOP_INSTALL/sbin:$HADOOP_INSTALL/bin:$JAVA_HOME
+
+
+-- /home/genel/hadoop-2.7.1/etc/hadoop/core-site.xml
+	
+ <configuration>
+ 
+   <property>
+ 
+     <name>fs.default.name</name>
+ 
+     <value>hdfs://localhost/</value>
+ 
+   </property>
+ 
+ </configuration>
+
+-- /home/genel/hadoop-2.7.1/etc/hadoop/hdfs-site.xml
+	
+<configuration>
+ 
+   <property>
+ 
+     <name>dfs.replication</name>
+ 
+     <value>1</value>
+ 
+   </property>
+ 
+ </configuration>
+
+-- /home/genel/hadoop-2.7.1/etc/hadoop/mapred-site.xml 
+-- (Eğer yoksa .template uzantısını silerek oluşturabilirsiniz.)
+	
+ <configuration>
+ 
+   <property>
+ 
+     <name>mapreduce.framework.name</name>
+ 
+     <value>yarn</value>
+ 
+   </property>
+ 
+ </configuration>
+
+-- /home/genel/hadoop-2.7.1/etc/hadoop/yarn-site.xml
+	
+ <configuration>
+ 
+   <property>
+ 
+     <name>yarn.resourcemanager.address</name>
+ 
+     <value>localhost:8032</value>
+ 
+   </property>
+ 
+   <property>
+ 
+     <name>yarn.nodemanager.aux-services</name>
+ 
+     <value>mapreduce_shuffle</value>
+ 
+   </property>
+ 
+ </configuration>
+
+
+$hadoop namenode -format
+
+$start-dfs.sh
+$start-yarn.sh
+
+
+
+-- HDFS : http://localhost:50070/
+
+-- YARN : http://localhost:8088/
+
+
+$stop-yarn.sh  
+$stop-dfs.sh
+
+
+
+
