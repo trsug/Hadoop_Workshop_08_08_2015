@@ -107,6 +107,9 @@ $start-yarn.sh
 
 -- YARN : http://localhost:8088/
 
+$hadoop fs -mkdir /user
+$hadoop fs -mkdir /user/genel
+
 
 $stop-yarn.sh  
 $stop-dfs.sh
